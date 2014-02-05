@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Logged-in SSL module install file.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function logged_in_ssl_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'logged_in_ssl_%'");
+}
+
+

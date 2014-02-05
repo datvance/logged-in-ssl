@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * Utility function for common module cookie name
+ * We don't use user_save_cookie because that is
+ * persistent (365 days) and we want session
+ * cookies only
+ * @return string
+ */
+function _logged_in_ssl_cookie_name()
+{
+  return basename(__FILE__, '.module');
+}
+
+/**
+ * Implements hook_user_login().
+ * Sets cookie denoting user is logged in
+ * Since the drupal auth cookie is https only, there is no way to tell
+ * if someone is logged in when they are on non secure page
+ * @param $form
+ * @param $account
+ */
+function logged_in_ssl_user_login(&$form, $account)
+{
+  $params = session_get_cookie_params();
+  $expire = $params['lifetime'] ? REQUEST_TIME + $params['lifetime'] : 0;
+  $cookie_name = _logged_in_ssl_cookie_name();
+  setrawcookie($cookie_name, $account->uid, $expire, '/');
+  $_COOKIE[$cookie_name] = $account->uid;
+}
+
+/**
+ * Implements hook_user_logout().
+ * Removes cookie set previously
+ * @param $account
+ */
+function logged_in_ssl_user_logout($account)
+{
+  $cookie_name = _logged_in_ssl_cookie_name();
+  setrawcookie($cookie_name, '', (REQUEST_TIME - 3600) , '/');
+}
+
+/**
+ * Implements hook_boot().
+ * If user is logged in and they are not on https page,
+ * redirect to same page using https
+ * Loses any #fragment in url since those aren't passed to php
+ */
+function logged_in_ssl_boot()
+{
+  $is_local = defined('__ENV__') && __ENV__ == 'local';
+  if($is_local) return;
+
+  $cookie_name = _logged_in_ssl_cookie_name();
+  if($_SERVER['HTTPS'] != 'on' && isset($_COOKIE[$cookie_name]) && !empty($_COOKIE[$cookie_name]))
+  {
+    //drupal_goto not available yet
+    header('Location: ' . str_replace('http://', 'https://', $GLOBALS['base_url']) . request_uri());
+    exit;
+  }
+}

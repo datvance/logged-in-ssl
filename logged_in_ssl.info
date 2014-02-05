@@ -1,0 +1,6 @@
+
+name = "Logged-in SSL"
+description = "Force https for logged in users."
+core = 7.x
+files[] = logged_in_ssl.module
+

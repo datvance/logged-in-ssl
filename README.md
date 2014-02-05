@@ -12,4 +12,4 @@ To disable on local/dev instances, either disable the module (obviously), or def
 
 ```php
 define('__ENV__', 'local');
-```php
+```

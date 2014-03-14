@@ -4,6 +4,8 @@ Once a user authenticates, no matter their role, they will always be redirected 
 
 Obviously you need to make sure SSL is enabled for your site.
 
+To install, just upload to your sites/*/modules folder and enable. Once enabled, log out, then log in again. That's all, it should work.
+
 There are no configuration options.
 
 URL fragments are not preserved across redirects, so that if a user accesses http://example.com/foo/bar#fragment they will be redirected to https://example.com/foo/bar (i.e. without the #fragment).
